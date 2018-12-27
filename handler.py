@@ -5,12 +5,21 @@ def lambda_handler(event, context):
     client = boto3.client('ec2')
 
     res = client.describe_spot_price_history(
-        DryRun=True
+        Filters=[
+            {
+                'Name': 'availability-zone',
+                'Values': ['eu-west-1a']
+            }
+        ],
+        InstanceTypes=['t1.micro',]
     )
+    
+    
+    print(res.get('SpotPriceHistory'))
 
     return {
         'statusCode': 200,
-        'body': json.dumps(res)
+        'body': 'done'
     }
 
 # client.describe_spot_price_history(

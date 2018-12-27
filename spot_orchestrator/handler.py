@@ -40,4 +40,4 @@ def lambda_handler(event, context):
 
 
 #### debug
-lambda_handler(None, None)
+# lambda_handler(None, None)

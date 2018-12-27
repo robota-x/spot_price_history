@@ -1,0 +1,36 @@
+{
+    "instance_types": [
+        "t1.micro",
+        "t2.nano",
+        "t2.micro",
+        "t2.small",
+        "t2.medium",
+        "t2.large",
+        "t2.xlarge",
+        "t2.2xlarge",
+        "t3.nano",
+        "t3.micro",
+        "t3.small",
+        "t3.medium",
+        "t3.large",
+        "t3.xlarge",
+        "t3.2xlarge"
+    ],
+    "availability_zones": [
+        "eu-west-1a",
+        "eu-west-1b",
+        "eu-west-1c",
+        "eu-west-2a",
+        "eu-west-2b",
+        "eu-west-2c",
+        "eu-west-3a",
+        "eu-west-3b",
+        "eu-west-3c",
+        "eu-central-1a",
+        "eu-central-1b",
+        "eu-central-1c",
+        "eu-north-1a",
+        "eu-north-1b",
+        "eu-north-1c"
+    ]
+}

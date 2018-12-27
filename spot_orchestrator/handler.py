@@ -1,46 +1,43 @@
 import boto3
 import json
+import configparser
 
 
-client = boto3.client('lambda')
+session = boto3.Session(profile_name='spot', region_name='eu-west-1')  # TODO remove profile
+lambda_client = session.client('lambda')
+s3_client = session.client('s3')
+
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 
-INSTANCE_TYPES = [
-    't1.micro',
-    't2.nano',  # seems to be mostly unavailable
-    't2.micro',
-    't2.small',
-    't2.medium',
-    't2.large',
-    't2.xlarge',
-    't2.2xlarge',
-    't3.nano',
-    't3.micro',
-    't3.small',
-    't3.medium',
-    't3.large',
-    't3.xlarge',
-    't3.2xlarge',
-]
+def load_required_metrics():
+    obj_body = s3_client.get_object(
+        Bucket=config['aws']['s3_bucket'],
+        Key=config['aws']['requirements_object'],
+    )['Body']
 
-AVAILABILITY_ZONES = [
-    'eu-west-1a',
-    'eu-west-1b',
-    'eu-west-1c',
-]
+    requirements = json.loads(obj_body.read().decode('utf-8'))
 
-PARSE_FUNCTION_NAME = 'spot_parser'  # TODO: move to arn
+    return requirements['availability_zones'], requirements['instance_types']
 
 
 def lambda_handler(event, context):
-    for zone in AVAILABILITY_ZONES:
-        deb = client.invoke(
-            FunctionName=PARSE_FUNCTION_NAME,
+    availability_zones, instance_types = load_required_metrics()
+
+    for zone in availability_zones:
+        result = lambda_client.invoke(
+            FunctionName=config['aws']['parser_function'],
             InvocationType='Event',
             Payload=json.dumps({
                 'availability_zone': zone,
-                'instance_types': INSTANCE_TYPES
+                'instance_types': instance_types
             })
         )
 
-        print(deb)
+        print(result)
+
+
+
+#### debug
+lambda_handler(None, None)

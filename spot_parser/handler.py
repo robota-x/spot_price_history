@@ -26,6 +26,7 @@ def aurora_connector():
     return connect(
         host=config[env]['host'],
         user=config[env]['user'],
+        password=config[env].get('pass', None),
         db=config[env]['db'],
         charset=config[env]['charset'],
         cursorclass=cursors.DictCursor

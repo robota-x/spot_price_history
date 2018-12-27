@@ -71,21 +71,20 @@ def data_writer(spot_prices):
     connection.commit()
     connection.close()
 
+
 def lambda_handler(event, context):
-    availability_zones = event.get('availability_zone', ['eu-west-1a'])
-    instance_types = event.get('instance_types', ['t2.micro'])
+    availability_zone = event.get('availability_zone', 'eu-west-1a')
+    instance_types = event.get('instance_types', ['t1.micro'])
 
     end_time = parse(event['end_time']) if 'end_time' in event else None
     start_time = parse(event['start_time']) if 'start_time' in event else None
 
-    spot_prices = []
-    for zone in availability_zones:
-        spot_prices += (price_grabber(
-            zone,
-            instance_types,
-            end_time=end_time,
-            start_time=start_time)
-        )
+    spot_prices = price_grabber(
+        availability_zone,
+        instance_types,
+        end_time=end_time,
+        start_time=start_time
+    )
 
     data_writer(spot_prices)
 
@@ -98,11 +97,11 @@ def lambda_handler(event, context):
 
 
 ##### debug
-fake_event = {
-    'availability_zone': ['eu-west-1a', 'eu-west-1b', 'eu-west-1c'],
-    'instance_types': ['t1.micro', 't2.micro', 't3.micro'],
-    'end_time': datetime(2018, 11, 1).isoformat(),
-    # 'start_time': datetime(2018,11,1,1).isoformat(),
-}
-res = lambda_handler(fake_event, None)
-print(res)
+# fake_event = {
+#     'availability_zone': 'eu-west-1a',
+#     'instance_types': ['t1.micro', 't2.micro', 't3.micro'],
+#     'end_time': datetime(2018, 12, 20).isoformat(),
+#     # 'start_time': datetime(2018, 10, 1).isoformat(),
+# }
+# res = lambda_handler(fake_event, None)
+# print(res)

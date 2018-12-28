@@ -1,5 +1,4 @@
 pymysql*
 PyMySQL*
 config.ini
-parser.zip
-orchestrator.zip
+*.zip

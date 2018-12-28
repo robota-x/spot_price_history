@@ -35,8 +35,3 @@ def lambda_handler(event, context):
         )
 
         print(result)
-
-
-
-#### debug
-# lambda_handler(None, None)

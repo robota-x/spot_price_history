@@ -19,32 +19,31 @@ def load_required_metrics():
 
     requirements = json.loads(obj_body.read().decode('utf-8'))
 
-    return requirements['availability_zones'], requirements['instance_types']
+    return requirements['regions'], requirements['instance_types']
 
 
 def lambda_handler(event, context):
     try:
-        availability_zones, instance_types = load_required_metrics()
+        regions, instance_types = load_required_metrics()
 
-        for zone in availability_zones:
+        for region in regions:
             result = lambda_client.invoke(
                 FunctionName=config['aws']['parser_function'],
                 InvocationType='Event',
                 Payload=json.dumps({
-                    'availability_zone': zone,
+                    'region': region,
                     'instance_types': instance_types
                 })
             )
 
-        print(f'orchestrator processed {len(availability_zones)} zones')
+        print(f'orchestrator processed {len(regions)} regions')
         return {
             'statusCode': 200,
             'body': {
-                'processed_zones': len(availability_zones)
+                'processed_regions': len(regions)
             }
         }
     except:
         # dump trace and event
         traceback.print_exc()
         print(json.dumps(event))
-

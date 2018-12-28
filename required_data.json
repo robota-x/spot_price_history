@@ -179,33 +179,15 @@
         "a1.2xlarge",
         "a1.4xlarge"
     ],
-    "availability_zones": [
-        "eu-west-1a",
-        "eu-west-1b",
-        "eu-west-1c",
-        "eu-west-2a",
-        "eu-west-2b",
-        "eu-west-2c",
-        "eu-west-3a",
-        "eu-west-3b",
-        "eu-west-3c",
-        "eu-central-1a",
-        "eu-central-1b",
-        "eu-central-1c",
-        "eu-north-1a",
-        "eu-north-1b",
-        "eu-north-1c",
-        "us-east-1a",
-        "us-east-1b",
-        "us-east-1c",
-        "us-east-1d",
-        "us-east-1e",
-        "us-east-1f",
-        "us-east-2a",
-        "us-east-2b",
-        "us-east-2c",
-        "us-west-2a",
-        "us-west-2b",
-        "us-west-2c"
+    "regions": [
+        "eu-west-1",
+        "eu-west-2",
+        "eu-west-3",
+        "eu-central-1",
+        "eu-north-1",
+        "us-east-1",
+        "us-east-2",
+        "us-west-2",
+        "ap-south-1"
     ]
 }

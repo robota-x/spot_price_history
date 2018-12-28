@@ -3,9 +3,8 @@ import json
 import configparser
 
 
-session = boto3.Session(profile_name='spot', region_name='eu-west-1')  # TODO remove profile
-lambda_client = session.client('lambda')
-s3_client = session.client('s3')
+lambda_client = boto3.client('lambda')
+s3_client = boto3.client('s3')
 
 config = configparser.ConfigParser()
 config.read('config.ini')

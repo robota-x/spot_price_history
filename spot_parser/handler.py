@@ -47,7 +47,7 @@ def price_grabber(availability_zone, instance_types, end_time=None, start_time=N
         ProductDescriptions=['Linux/UNIX', 'Windows'],
     )
 
-    return [spot_parser(spot) for spot in res.get('SpotPriceHistory')]
+    return [spot_parser(spot) for spot in res.get('SpotPriceHistory', [])]
 
 
 def data_writer(spot_prices):

@@ -2,3 +2,5 @@ pymysql*
 PyMySQL*
 config.ini
 *.zip
+env
+sample_msg.*

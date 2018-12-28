@@ -1,10 +1,13 @@
-from msg_pb2 import Result
 import json
-import datetime
+
+from msg_pb2 import Result
+
 
 message = Result()
 
-for _ in range(6000):
+repetitions = 4000
+
+for _ in range(repetitions):
     price = message.spotprices.add()
 
     price.time = '2018-12-28T11:04:00'
@@ -22,5 +25,5 @@ with open('sample_msg.json', 'w') as f:
         'InstanceType': 'c4.8xlarge',
         'ProductDescription': 'Linux/UNIX',
         'SpotPrice': '0.532300',
-        'Timestamp': datetime.datetime(2018, 12, 28, 11, 4).isoformat()
-    }] * 6000))
+        'Timestamp': '2018-12-28T11:04:00'
+    }] * repetitions))

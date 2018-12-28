@@ -22,22 +22,28 @@ def load_required_metrics():
 
 
 def lambda_handler(event, context):
-    availability_zones, instance_types = load_required_metrics()
+    try:
+        availability_zones, instance_types = load_required_metrics()
 
-    for zone in availability_zones:
-        result = lambda_client.invoke(
-            FunctionName=config['aws']['parser_function'],
-            InvocationType='Event',
-            Payload=json.dumps({
-                'availability_zone': zone,
-                'instance_types': instance_types
-            })
-        )
+        for zone in availability_zones:
+            result = lambda_client.invoke(
+                FunctionName=config['aws']['parser_function'],
+                InvocationType='Event',
+                Payload=json.dumps({
+                    'availability_zone': zone,
+                    'instance_types': instance_types
+                })
+            )
 
-    print(f'orchestrator processed {len(availability_zones)} zones')
-    return {
-        'statusCode': 200,
-        'body': {
-            'processed_zones': len(availability_zones)
+        print(f'orchestrator processed {len(availability_zones)} zones')
+        return {
+            'statusCode': 200,
+            'body': {
+                'processed_zones': len(availability_zones)
+            }
         }
-    }
+    except:
+        # dump trace and event
+        traceback.print_exc()
+        print(json.dumps(event))
+

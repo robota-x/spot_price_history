@@ -38,30 +38,36 @@ def price_grabber(availability_zone, instance_types, end_time=None, start_time=N
 
 
 def lambda_handler(event, context):
-    availability_zone = event.get('availability_zone', 'eu-west-1a')
-    instance_types = event.get('instance_types', ['t1.micro'])
+    try:
+        availability_zone = event.get('availability_zone', 'eu-west-1a')
+        instance_types = event.get('instance_types', ['t1.micro'])
 
-    end_time = parse(event['end_time']) if 'end_time' in event else None
-    start_time = parse(event['start_time']) if 'start_time' in event else None
+        end_time = parse(event['end_time']) if 'end_time' in event else None
+        start_time = parse(event['start_time']) if 'start_time' in event else None
 
-    spot_prices = price_grabber(
-        availability_zone,
-        instance_types,
-        end_time=end_time,
-        start_time=start_time
-    )
-
-    if(len(spot_prices)):
-        lambda_client.invoke(
-            FunctionName=config['aws']['writer_function'],
-            InvocationType='Event',
-            Payload=json.dumps({'spot_prices': spot_prices})
+        spot_prices = price_grabber(
+            availability_zone,
+            instance_types,
+            end_time=end_time,
+            start_time=start_time
         )
 
-    print(f'parser processed {len(spot_prices)} entries for zone: {availability_zone}')
-    return {
-        'statusCode': 200,
-        'body': {
-            'processed_entries': len(spot_prices)
+        if(len(spot_prices)):
+            lambda_client.invoke(
+                FunctionName=config['aws']['writer_function'],
+                InvocationType='Event',
+                Payload=json.dumps({'spot_prices': spot_prices})
+            )
+
+        print(f'parser processed {len(spot_prices)} entries for zone: {availability_zone}')
+        return {
+            'statusCode': 200,
+            'body': {
+                'processed_entries': len(spot_prices)
+            }
         }
-    }
+    except:
+    # dump trace and event
+    traceback.print_exc()
+    print(json.dumps(event))
+

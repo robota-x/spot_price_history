@@ -43,14 +43,19 @@ def data_writer(spot_prices):
 
 
 def lambda_handler(event, context):
-    spot_prices = event.get('spot_prices', [])
+    try:
+        spot_prices = event.get('spot_prices', [])
 
-    data_writer(spot_prices)
+        data_writer(spot_prices)
 
-    print(f'writer processed {len(spot_prices)} entries')
-    return {
-        'statusCode': 200,
-        'body': {
-            'processed_entries': len(spot_prices)
+        print(f'writer processed {len(spot_prices)} entries')
+        return {
+            'statusCode': 200,
+            'body': {
+                'processed_entries': len(spot_prices)
+            }
         }
-    }
+    except:
+        # dump trace and event
+        traceback.print_exc()
+        print(json.dumps(event))

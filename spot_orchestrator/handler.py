@@ -1,6 +1,7 @@
 import boto3
-import json
 import configparser
+import json
+import traceback
 
 
 lambda_client = boto3.client('lambda')

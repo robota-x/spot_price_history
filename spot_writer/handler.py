@@ -1,6 +1,7 @@
 import configparser
 import json
 import os
+import traceback
 
 from pymysql import connect, cursors
 

@@ -1,6 +1,7 @@
 import boto3
 import configparser
 import json
+import traceback
 
 from datetime import datetime, timedelta
 from dateutil.parser import parse
@@ -43,7 +44,8 @@ def lambda_handler(event, context):
         instance_types = event.get('instance_types', ['t1.micro'])
 
         end_time = parse(event['end_time']) if 'end_time' in event else None
-        start_time = parse(event['start_time']) if 'start_time' in event else None
+        start_time = parse(event['start_time']
+                           ) if 'start_time' in event else None
 
         spot_prices = price_grabber(
             availability_zone,
@@ -59,7 +61,8 @@ def lambda_handler(event, context):
                 Payload=json.dumps({'spot_prices': spot_prices})
             )
 
-        print(f'parser processed {len(spot_prices)} entries for zone: {availability_zone}')
+        print(
+            f'parser processed {len(spot_prices)} entries for zone: {availability_zone}')
         return {
             'statusCode': 200,
             'body': {
@@ -67,7 +70,6 @@ def lambda_handler(event, context):
             }
         }
     except:
-    # dump trace and event
+        # dump trace and event
     traceback.print_exc()
     print(json.dumps(event))
-

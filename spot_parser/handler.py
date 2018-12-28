@@ -51,12 +51,14 @@ def lambda_handler(event, context):
         start_time=start_time
     )
 
-    lambda_client.invoke(
-        FunctionName=config['aws']['writer_function'],
-        InvocationType='Event',
-        Payload=json.dumps({'spot_prices': spot_prices})
-    )
+    if(len(spot_prices)):
+        lambda_client.invoke(
+            FunctionName=config['aws']['writer_function'],
+            InvocationType='Event',
+            Payload=json.dumps({'spot_prices': spot_prices})
+        )
 
+    print(f'parser processed {len(spot_prices)} entries for zone: {availability_zone}')
     return {
         'statusCode': 200,
         'body': {

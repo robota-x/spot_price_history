@@ -34,4 +34,10 @@ def lambda_handler(event, context):
             })
         )
 
-        print(result)
+    print(f'orchestrator processed {len(availability_zones)} zones')
+    return {
+        'statusCode': 200,
+        'body': {
+            'processed_zones': len(availability_zones)
+        }
+    }

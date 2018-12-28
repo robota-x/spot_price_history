@@ -47,6 +47,7 @@ def lambda_handler(event, context):
 
     data_writer(spot_prices)
 
+    print(f'writer processed {len(spot_prices)} entries')
     return {
         'statusCode': 200,
         'body': {

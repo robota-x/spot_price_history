@@ -6,15 +6,26 @@ import traceback
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 
+from msg_pb2 import Result
+
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 
 
-def spot_parser(spot):
-    spot['Timestamp'] = spot['Timestamp'].isoformat() if 'Timestamp' in spot else None
+def serialise_prices(spot_prices):
+    msg = Result()
 
-    return spot
+    for datapoint in spot_prices:
+        price = msg.spotprices.add()
+
+        price.time = datapoint['Timestamp'].isoformat() if 'Timestamp' in datapoint else None
+        price.price = float(datapoint['SpotPrice']) if 'SpotPrice' in datapoint else None
+        price.zone = datapoint.get('AvailabilityZone')
+        price.type = datapoint.get('InstanceType')
+        price.product = datapoint.get('ProductDescription')
+    
+    return msg.SerializeToString()
 
 
 def get_availability_zones(client, region_name):
@@ -40,7 +51,7 @@ def get_region_spot_prices(region, instance_types, end_time=None, start_time=Non
             StartTime=computed_start_time,
             ProductDescriptions=['Linux/UNIX', 'Windows'],
         )
-        zone_prices = [spot_parser(spot) for spot in res.get('SpotPriceHistory', [])]
+        zone_prices = res.get('SpotPriceHistory', [])
 
         print(f'fetched {len(zone_prices)} prices for zone: {zone}')
         spot_prices += zone_prices
@@ -62,7 +73,7 @@ def lambda_handler(event, context):
             boto3.client('lambda').invoke(
                 FunctionName=config['aws']['writer_function'],
                 InvocationType='Event',
-                Payload=json.dumps({'spot_prices': spot_prices})
+                Payload=serialise_prices(spot_prices)
             )
 
         print(f'parser processed {len(spot_prices)} entries for region: {region}')

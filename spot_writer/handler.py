@@ -1,3 +1,4 @@
+import base64
 import configparser
 import os
 import traceback
@@ -10,7 +11,8 @@ def deserialise_prices(payload):
     msg = Result()
 
     try:
-        msg.ParseFromString(payload)
+        payload_bytes = base64.b64decode(payload.encode('ascii'))
+        msg.ParseFromString(payload_bytes)
 
         return msg.spotprices
     except:

@@ -1,3 +1,4 @@
+import base64
 import json
 
 from msg_pb2 import Result
@@ -5,7 +6,7 @@ from msg_pb2 import Result
 
 message = Result()
 
-repetitions = 10
+repetitions = 100
 
 for _ in range(repetitions):
     price = message.spotprices.add()
@@ -16,8 +17,14 @@ for _ in range(repetitions):
     price.type = 'c4.8xlarge'
     price.product = 'Linux/UNIX'
 
+binary_message = message.SerializeToString()
+
 with open('sample_msg.bin', 'wb') as f:
-    f.write(message.SerializeToString())
+    f.write(binary_message)
+
+with open('sample_msg.b64.json', 'w') as f:
+    encoded_string = base64.b64encode(binary_message).decode('ascii')
+    f.write(json.dumps(encoded_string))  # this feels so stupid.
 
 with open('sample_msg.json', 'w') as f:
     f.write(json.dumps([{

@@ -1,9 +1,21 @@
 import configparser
-import json
 import os
 import traceback
 
+from msg_pb2 import Result
 from pymysql import connect, cursors
+
+
+def deserialise_prices(payload):
+    msg = Result()
+
+    try:
+        msg.ParseFromString(payload)
+
+        return msg.spotprices
+    except:
+        print(f'failed parsing payload: {payload}')
+        return []
 
 
 def aurora_connector():
@@ -22,41 +34,39 @@ def aurora_connector():
 
 
 def data_writer(spot_prices):
-    required_data = ['Timestamp', 'SpotPrice',
-                     'AvailabilityZone', 'InstanceType', 'ProductDescription']
+    required_fields = ['time', 'price',
+                       'zone', 'type', 'product']
 
     connection = aurora_connector()
     with connection.cursor() as cursor:
-        for price_data in spot_prices:
-            if all([key in price_data for key in required_data]):
+        success_count = 0
+
+        for datapoint in spot_prices:
+            if all([getattr(datapoint, field) for field in required_fields]):
                 insert_statement = 'INSERT INTO `data` VALUES (NULL, %(time)s, %(price)s, %(zone)s, %(type)s, %(product)s)'
 
                 cursor.execute(insert_statement, {
-                    'time': price_data['Timestamp'],
-                    'price': price_data['SpotPrice'],
-                    'zone': price_data['AvailabilityZone'],
-                    'type': price_data['InstanceType'],
-                    'product': price_data['ProductDescription'],
+                    'time': datapoint.time,
+                    'price': datapoint.price,
+                    'zone': datapoint.zone,
+                    'type': datapoint.type,
+                    'product': datapoint.product,
                 })
+            success_count += 1
 
     connection.commit()
     connection.close()
+    return success_count
 
 
 def lambda_handler(event, context):
-    try:
-        spot_prices = event.get('spot_prices', [])
+    spot_prices = deserialise_prices(event)
+    success_count = data_writer(spot_prices)
 
-        data_writer(spot_prices)
-
-        print(f'writer processed {len(spot_prices)} entries')
-        return {
-            'statusCode': 200,
-            'body': {
-                'processed_entries': len(spot_prices)
-            }
+    print(f'writer processed {len(spot_prices)} entries. {success_count} success, {len(spot_prices) - success_count} failures')
+    return {
+        'statusCode': 200,
+        'body': {
+            'processed_entries': len(spot_prices)
         }
-    except:
-        # dump trace and event
-        traceback.print_exc()
-        print(json.dumps(event))
+    }

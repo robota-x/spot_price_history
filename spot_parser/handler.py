@@ -5,7 +5,6 @@ import traceback
 
 from datetime import datetime, timedelta
 from dateutil.parser import parse
-
 from msg_pb2 import Result
 
 
@@ -24,7 +23,7 @@ def serialise_prices(spot_prices):
         price.zone = datapoint.get('AvailabilityZone')
         price.type = datapoint.get('InstanceType')
         price.product = datapoint.get('ProductDescription')
-    
+
     return msg.SerializeToString()
 
 

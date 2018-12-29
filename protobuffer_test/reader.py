@@ -9,4 +9,5 @@ with open('sample_msg.bin', 'rb') as f:
     message = Result()
     message.ParseFromString(f.read())
 
-    print(message)
+    for price in message.spotprices:
+        print('price!', price)

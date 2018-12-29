@@ -5,7 +5,7 @@ from msg_pb2 import Result
 
 message = Result()
 
-repetitions = 4000
+repetitions = 10
 
 for _ in range(repetitions):
     price = message.spotprices.add()

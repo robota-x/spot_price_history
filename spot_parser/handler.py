@@ -1,6 +1,7 @@
 import base64
 import boto3
 import configparser
+import json
 import traceback
 
 from datetime import datetime, timedelta
@@ -71,7 +72,7 @@ def lambda_handler(event, context):
         boto3.client('lambda').invoke(
             FunctionName=config['aws']['writer_function'],
             InvocationType='Event',
-            Payload=base64.b64encode(serialise_prices(spot_prices)).decode('ascii')  # ....yeah.
+            Payload=json.dumps(base64.b64encode(serialise_prices(spot_prices)).decode('ascii'))  # ....yeah.
         )
 
     print(f'parser processed {len(spot_prices)} entries for region: {region}')

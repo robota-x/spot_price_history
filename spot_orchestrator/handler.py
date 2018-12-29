@@ -23,27 +23,16 @@ def load_required_metrics():
 
 
 def lambda_handler(event, context):
-    try:
-        regions, instance_types = load_required_metrics()
+    regions, instance_types = load_required_metrics()
 
-        for region in regions:
-            result = lambda_client.invoke(
-                FunctionName=config['aws']['parser_function'],
-                InvocationType='Event',
-                Payload=json.dumps({
-                    'region': region,
-                    'instance_types': instance_types
-                })
-            )
+    for region in regions:
+        result = lambda_client.invoke(
+            FunctionName=config['aws']['parser_function'],
+            InvocationType='Event',
+            Payload=json.dumps({
+                'region': region,
+                'instance_types': instance_types
+            })
+        )
 
-        print(f'orchestrator processed {len(regions)} regions')
-        return {
-            'statusCode': 200,
-            'body': {
-                'processed_regions': len(regions)
-            }
-        }
-    except:
-        # dump trace and event
-        traceback.print_exc()
-        print(json.dumps(event))
+    print(f'orchestrator processed {len(regions)} regions')

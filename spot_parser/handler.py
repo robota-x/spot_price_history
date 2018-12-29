@@ -1,6 +1,5 @@
 import boto3
 import configparser
-import json
 import traceback
 
 from datetime import datetime, timedelta
@@ -59,24 +58,19 @@ def get_region_spot_prices(region, instance_types, end_time=None, start_time=Non
 
 
 def lambda_handler(event, context):
-    try:
-        region = event.get('region', 'eu-west-1')
-        instance_types = event.get('instance_types', ['t1.micro'])
+    region = event.get('region', 'eu-west-1')
+    instance_types = event.get('instance_types', ['t1.micro'])
 
-        end_time = parse(event['end_time']) if 'end_time' in event else None
-        start_time = parse(event['start_time']) if 'start_time' in event else None
+    end_time = parse(event['end_time']) if 'end_time' in event else None
+    start_time = parse(event['start_time']) if 'start_time' in event else None
 
-        spot_prices = get_region_spot_prices(region, instance_types, end_time=end_time, start_time=start_time)
+    spot_prices = get_region_spot_prices(region, instance_types, end_time=end_time, start_time=start_time)
 
-        if(len(spot_prices)):
-            boto3.client('lambda').invoke(
-                FunctionName=config['aws']['writer_function'],
-                InvocationType='Event',
-                Payload=serialise_prices(spot_prices)
-            )
+    if(len(spot_prices)):
+        boto3.client('lambda').invoke(
+            FunctionName=config['aws']['writer_function'],
+            InvocationType='Event',
+            Payload=serialise_prices(spot_prices)
+        )
 
-        print(f'parser processed {len(spot_prices)} entries for region: {region}')
-    except:
-        # dump trace and event
-        traceback.print_exc()
-        print(json.dumps(event))
+    print(f'parser processed {len(spot_prices)} entries for region: {region}')

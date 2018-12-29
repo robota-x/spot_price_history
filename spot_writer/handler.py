@@ -64,9 +64,3 @@ def lambda_handler(event, context):
     success_count = data_writer(spot_prices)
 
     print(f'writer processed {len(spot_prices)} entries. {success_count} success, {len(spot_prices) - success_count} failures')
-    return {
-        'statusCode': 200,
-        'body': {
-            'processed_entries': len(spot_prices)
-        }
-    }

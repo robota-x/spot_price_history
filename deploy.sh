@@ -6,21 +6,21 @@ ROOT_DIR=$(pwd)
 
 echo 'creating deploy pkg for orchestrator...'
 cd $ROOT_DIR/spot_orchestrator/env/lib/python3.6/site-packages/ 
-zip -r9 $ROOT_DIR/deploy_packages/orchestrator.zip . -x \*pip/\* \*setuptools/\* \*wheel/\* \*__pycache__/\*
+zip -qr9 $ROOT_DIR/deploy_packages/orchestrator.zip . -x \*pip/\* \*setuptools/\* \*wheel/\* \*__pycache__/\*
 cd $ROOT_DIR/spot_orchestrator
-zip -g9 $ROOT_DIR/deploy_packages/orchestrator.zip handler.py 
+zip -g9 $ROOT_DIR/deploy_packages/orchestrator.zip handler.py config.ini
 
 echo 'creating deploy pkg for parser...'
 cd $ROOT_DIR/spot_parser/env/lib/python3.6/site-packages/
 zip -qr9 $ROOT_DIR/deploy_packages/parser.zip . -x \*pip/\* \*setuptools/\* \*wheel/\* \*__pycache__/\*
 cd $ROOT_DIR/spot_parser
-zip -g9 $ROOT_DIR/deploy_packages/parser.zip handler.py 
+zip -g9 $ROOT_DIR/deploy_packages/parser.zip handler.py config.ini msg_pb2.py
 
 echo 'creating deploy pkg for writer...'
 cd $ROOT_DIR/spot_writer/env/lib/python3.6/site-packages/
 zip -qr9 $ROOT_DIR/deploy_packages/writer.zip . -x \*pip/\* \*setuptools/\* \*wheel/\* \*__pycache__/\*
 cd $ROOT_DIR/spot_writer
-zip -g9 $ROOT_DIR/deploy_packages/writer.zip handler.py 
+zip -g9 $ROOT_DIR/deploy_packages/writer.zip handler.py config.ini msg_pb2.py
 
 # upload to lambda
 echo 'deploying all functions to lambda...'

@@ -1,23 +1,30 @@
-# create zip files
+# initial cleanup
+rm -rf deploy_packages
 mkdir -p deploy_packages
 
+ROOT_DIR=$(pwd)
+
 echo 'creating deploy pkg for orchestrator...'
-cd spot_orchestrator
-zip -r9 ../deploy_packages/orchestrator.zip .
-cd -
+cd $ROOT_DIR/spot_orchestrator/env/lib/python3.6/site-packages/
+zip -qr9 $ROOT_DIR/deploy_packages/orchestrator.zip .
+cd $ROOT_DIR/spot_orchestrator
+zip -g9 $ROOT_DIR/deploy_packages/orchestrator.zip handler.py 
 
 echo 'creating deploy pkg for parser...'
-cd spot_parser
-zip -r9 ../deploy_packages/parser.zip .
-cd -
+cd $ROOT_DIR/spot_parser/env/lib/python3.6/site-packages/
+zip -qr9 $ROOT_DIR/deploy_packages/parser.zip .
+cd $ROOT_DIR/spot_parser
+zip -g9 $ROOT_DIR/deploy_packages/parser.zip handler.py 
 
 echo 'creating deploy pkg for writer...'
-cd spot_writer
-zip -r9 ../deploy_packages/writer.zip .
-cd -
+cd $ROOT_DIR/spot_writer/env/lib/python3.6/site-packages/
+zip -qr9 $ROOT_DIR/deploy_packages/writer.zip .
+cd $ROOT_DIR/spot_writer
+zip -g9 $ROOT_DIR/deploy_packages/writer.zip handler.py 
 
 # upload to lambda
 echo 'deploying all functions to lambda...'
+cd $ROOT_DIR
 aws lambda update-function-code --profile spot --function-name spot_orchestrator --zip-file fileb://deploy_packages/orchestrator.zip
 aws lambda update-function-code --profile spot --function-name spot_parser --zip-file fileb://deploy_packages/parser.zip
 aws lambda update-function-code --profile spot --function-name spot_writer --zip-file fileb://deploy_packages/writer.zip

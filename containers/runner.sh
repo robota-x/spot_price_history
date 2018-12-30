@@ -1,4 +1,4 @@
-# usage: > sudo bash runner.sh
+# usage: > sudo bash runner.sh <env> (defaults to 'live')
 
 # ensure psql folder
 mkdir -p data/psql
@@ -7,7 +7,7 @@ mkdir -p data/psql
 echo starting psql server container and fetching data!
 
 docker run --rm --network spot_monitor --name psql-server -d -v $(pwd)/data/psql:/var/lib/postgresql/data postgres:alpine
-docker run --rm --network spot_monitor --name spot-runner -e ENV=dev -v ~/.aws:/.aws  spot_runner:dev
+docker run --rm --network spot_monitor --name spot-runner -e ENV=${1:-live} -v ~/.aws:/.aws  spot_runner:v1
 
 # cleanup
 echo completed fetch, shutting down!

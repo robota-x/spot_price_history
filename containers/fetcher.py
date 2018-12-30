@@ -3,6 +3,8 @@ import json
 import os
 
 from configparser import ConfigParser
+from datetime import datetime, timedelta
+
 
 config = None
 
@@ -19,8 +21,8 @@ def setup():
         boto3.setup_default_session(profile_name=config['aws_profile'])
 
 
-def get_availability_zones(region_name):
-    res = boto3.client('ec2', region_name=region_name).describe_availability_zones()
+def get_availability_zones(client):
+    res = client.describe_availability_zones()
 
     return [zone.get('ZoneName') for zone in res.get('AvailabilityZones', [])]
 
@@ -34,22 +36,61 @@ def load_required_metrics():
         )['Body']
 
     requirements = json.loads(obj_body.read().decode('utf-8'))
-    availability_zones = [zone for region in requirements.get('regions') for zone in get_availability_zones(region)]
 
     return {
         'regions': requirements.get('regions'),
         'instance_types': requirements.get('instance_types'),
-        'availability_zones': availability_zones
     }
+
+
+def fetch_zone_spot_prices(client, availability_zone, instance_types, end_time, start_time, product_description):
+    res = client.describe_spot_price_history(
+        AvailabilityZone=availability_zone,
+        InstanceTypes=instance_types,
+        EndTime=end_time,
+        StartTime=start_time,
+        ProductDescriptions=product_description,
+    )
+
+    return res.get('SpotPriceHistory', [])
+
+
+def collate_data(required_metrics, end_time=None, start_time=None):
+    computed_end_time = end_time or datetime.now()
+    computed_start_time = start_time or (computed_end_time - timedelta(seconds=3610))
+    product_description = ['Linux/UNIX', 'Windows']
+
+    spot_prices = []
+
+    for region in required_metrics['regions']:
+        client = boto3.client('ec2', region_name=region)
+
+        availability_zones = get_availability_zones(client)
+
+        for zone in availability_zones:
+            zone_prices = fetch_zone_spot_prices(
+                client=client,
+                availability_zone=zone,
+                instance_types=required_metrics['instance_types'],
+                end_time=computed_end_time,
+                start_time=computed_start_time,
+                product_description=product_description
+            )
+
+            print(f'fetched {len(zone_prices)} prices for zone: {zone}')
+            spot_prices += zone_prices
+
+    print(f'fetched {len(spot_prices)} prices for {len(required_metrics['regions'])}')
+    return spot_prices
 
 
 # still debug
 def main():
     setup()
     required_metrics = load_required_metrics()
+    spot_prices = collate_data(required_metrics)
 
- 
-    print(required_metrics)
+    print(spot_prices)
 
 
 main()

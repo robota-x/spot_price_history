@@ -22,3 +22,6 @@ class SpotWriter():
 
         self.connection.commit()
         print(f'{len(prepared_prices)} entries commited to database')
+
+
+# CREATE TABLE data (id SERIAL PRIMARY KEY, Timestamp timestamp, AvailabilityZone char(20), InstanceType char(20), ProductDescription char(20), SpotPrice float)

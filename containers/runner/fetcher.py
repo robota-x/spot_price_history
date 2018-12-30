@@ -4,7 +4,6 @@ import os
 
 from configparser import ConfigParser
 from datetime import datetime, timedelta
-from writer import SpotWriter
 
 config = None
 
@@ -17,9 +16,9 @@ def setup():
         config_parser.read('config.ini')
         config = config_parser[current_env]
 
-    if 'aws_profile' in config:
+    # live permission are expected through an attached role rather than auth
+    if 'aws_profile' in config:  
         boto3.setup_default_session(profile_name=config['aws_profile'])
-
 
 def get_availability_zones(client):
     res = client.describe_availability_zones()
@@ -84,21 +83,8 @@ def collate_data(required_metrics, end_time=None, start_time=None):
     return spot_prices
 
 
-def main():
+def get_spot_prices():
     setup()
 
     required_metrics = load_required_metrics()
-    spot_prices = collate_data(required_metrics)
-
-    SpotWriter(
-        dbname=config.get('db_name', None),
-        user=config.get('db_user', None),
-        password=config.get('db_password', None),
-        host=config.get('db_host', None),
-        port=config.get('db_port', None),
-    ).write_spot_prices(spot_prices)
-
-
-main()
-
-# CREATE TABLE data (id SERIAL PRIMARY KEY, Timestamp timestamp, AvailabilityZone char(20), InstanceType char(20), ProductDescription char(20), SpotPrice float)
+    return collate_data(required_metrics)

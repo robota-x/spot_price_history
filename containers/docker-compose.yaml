@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  psql-server:
+    image: postgres:alpine
+    volumes:
+      - ${PSQL_MOUNT}/data/psql:/var/lib/postgresql/data
+  runner:
+    image: spot_runner:${RUNNER_TAG}
+    volumes:
+      - ~/.aws:/.aws
+    environment:
+      - ENV

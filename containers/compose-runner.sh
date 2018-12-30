@@ -9,4 +9,4 @@ if [ $ENV = 'live' ];
     else export RUNNER_TAG=dev; 
 fi
 
-docker-compose up
+docker-compose run runner

@@ -11,3 +11,5 @@ services:
       - ~/.aws:/.aws
     environment:
       - ENV
+    depends_on:
+      - psql-server

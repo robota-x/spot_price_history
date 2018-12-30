@@ -61,12 +61,12 @@ def collate_data(required_metrics, end_time=None, start_time=None):
 
     spot_prices = []
 
-    for region in required_metrics['regions'][:1]:
+    for region in required_metrics['regions']:
         client = boto3.client('ec2', region_name=region)
 
         availability_zones = get_availability_zones(client)
 
-        for zone in availability_zones[:1]:
+        for zone in availability_zones:
             zone_prices = fetch_zone_spot_prices(
                 client=client,
                 availability_zone=zone,

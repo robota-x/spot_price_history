@@ -9,4 +9,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV AWS_SHARED_CREDENTIALS_FILE=/.aws/credentials
+
 CMD [ "python", "./main.py" ]

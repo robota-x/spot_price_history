@@ -4,7 +4,7 @@ import os
 
 from configparser import ConfigParser
 from datetime import datetime, timedelta
-
+from writer import SpotWriter
 
 config = None
 
@@ -62,12 +62,12 @@ def collate_data(required_metrics, end_time=None, start_time=None):
 
     spot_prices = []
 
-    for region in required_metrics['regions']:
+    for region in required_metrics['regions'][:1]:
         client = boto3.client('ec2', region_name=region)
 
         availability_zones = get_availability_zones(client)
 
-        for zone in availability_zones:
+        for zone in availability_zones[:1]:
             zone_prices = fetch_zone_spot_prices(
                 client=client,
                 availability_zone=zone,
@@ -80,17 +80,25 @@ def collate_data(required_metrics, end_time=None, start_time=None):
             print(f'fetched {len(zone_prices)} prices for zone: {zone}')
             spot_prices += zone_prices
 
-    print(f'fetched {len(spot_prices)} prices for {len(required_metrics['regions'])}')
+    print(f'fetched {len(spot_prices)} prices for {len(required_metrics["regions"])} regions')
     return spot_prices
 
 
-# still debug
 def main():
     setup()
+
     required_metrics = load_required_metrics()
     spot_prices = collate_data(required_metrics)
 
-    print(spot_prices)
+    SpotWriter(
+        dbname=config.get('db_name', None),
+        user=config.get('db_user', None),
+        password=config.get('db_password', None),
+        host=config.get('db_host', None),
+        port=config.get('db_port', None),
+    ).write_spot_prices(spot_prices)
 
 
 main()
+
+# CREATE TABLE data (id SERIAL PRIMARY KEY, Timestamp timestamp, AvailabilityZone char(20), InstanceType char(20), ProductDescription char(20), SpotPrice float)
